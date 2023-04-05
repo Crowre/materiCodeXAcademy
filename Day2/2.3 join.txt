@@ -1,0 +1,28 @@
+-- kalau misa tidak ada kolom yang sama yang mau dicari, langsung nama saja. tidak usah product.name
+-- nomor 1
+select product.name,price,discount from item
+join sales_item on item.id = sales_item.item_id
+join product on item.product_id = product.id
+order by product.name asc
+
+-- nomor 2
+select color,sales_item.quantity from item
+join sales_item on item.id = sales_item.item_id
+
+-- nomor 3
+select sales_item.id,discount,price from item
+join sales_item on item.id = sales_item.item_id
+where price > 120
+order by sales_item.id asc
+
+-- nomor 4
+select sales_item.id,
+concat(sales_person.first_name,' ',sales_person.last_name),
+product.name,item.price,
+sales_item.discount 
+from sales_item
+join sales_order on sales_order.id = sales_item.sales_order_id
+join sales_person on sales_person.id = sales_order.sales_person_id
+join item on item.id = sales_item.item_id
+join product on product.id = item.product_id
+order by product.name asc

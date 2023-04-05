@@ -1,0 +1,17 @@
+create or replace function cursor_film()
+return setof film
+language plpgsqlas
+$$
+declare 
+film_cursor cursor from
+                    select * from film order by p_film_id
+                    offset 10;
+begin
+    open film_cursor;
+
+        return query
+            fetch 10 from film_cursor;
+        close film_cursor;
+$$
+end;
+

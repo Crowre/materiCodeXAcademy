@@ -1,0 +1,232 @@
+--membuat table vendor
+create or replace procedure insert_vendor_2(
+	idnya integer,
+	acc_numb varchar,
+	namee varchar,
+	creditrate smallint,
+	preferredvendorstat boolean,
+	actflag boolean,
+	weburl varchar
+)
+language plpgsql
+as
+$$
+begin
+insert into purchasing.vendor(businessentityid,accountnumber,name,creditrating,preferredvendorstatus,activeflag,purchasingwebserviceurl)
+values (idnya,acc_numb,namee,creditrate,preferredvendorstat,actflag,weburl);
+commit;
+end;
+$$;
+select * from purchasing.vendor;
+CALL insert_vendor_2(99,'asdasd7'::varchar(15),'nameeee'::varchar(50),1::smallInt,true::boolean,true::boolean,'akjsdasd'::varchar(1024))
+
+select * from purchasing.vendor;
+select * from purchasing.productvendor;
+select * from purchasing.purchaseorderheader;
+
+--membuat table product vendor
+create or replace procedure insert_vendor_product(
+	product_id int,
+	business_id int,
+	avgleadtime int,
+	standard_price numeric,
+	last_receipt_cost numeric,
+	last_receipt_date timestamp,	
+	min_order int,
+	max_order int,
+	on_order int,
+	unit_measure char
+)
+language plpgsql
+as
+$$
+begin
+insert into purchasing.productvendor
+(
+	productid,
+	businessentityid,
+	averageleadtime,
+	standardprice,
+	lastreceiptcost,
+	lastreceiptdate,
+	minorderqty,
+	maxorderqty,
+	onorderqty,
+	unitmeasurecode
+)
+values
+(
+	product_id,
+	business_id,
+	avgleadtime,
+	standard_price,
+	last_receipt_cost,
+	last_receipt_date,
+	min_order,
+	max_order,
+	on_order,
+	unit_measure
+);
+commit;
+end;
+$$;
+drop procedure if exists insert_vendor_product;
+
+
+call insert_vendor_product
+(
+	1::integer,
+	99::integer,
+	19::integer,
+	12.22::numeric,
+	14.54::numeric,
+	current_timestamp::timestamp,
+	1::integer,
+	6::integer,
+	3::integer,
+	'CTN'::char(3)
+)
+
+select * from purchasing.purchaseorderdetail;
+
+create or replace procedure addtochart
+(
+	purchase_order_id int,
+	purchase_order_detail_id int,
+	due_time timestamp,
+	order_qty smallint,
+	product_id int,
+	unit_price numeric,
+	received_qty numeric(8,2),
+	rejected_qty numeric(8,2),
+	modified_date timestamp
+)
+language plpgsql
+as
+$$
+begin
+insert into purchasing.purchaseorderdetail
+values
+(
+	purchase_order_id,
+	purchase_order_detail_id,
+	due_time,
+	order_qty,
+	product_id,
+	unit_price,
+	received_qty,
+	rejected_qty,
+	modified_date
+);
+commit;
+end;
+$$;
+
+call addtochart
+(
+	1::integer,
+	240::integer,
+	current_timestamp::timestamp,
+	24::smallint,
+	1::int,
+	12.22::numeric,
+	133321.33::numeric(8,2),
+	523345.22::numeric(8,2),
+	current_timestamp::timestamp
+)
+
+--baru
+create or replace procedure gabung_tabel1(
+	-- 	parameter vendor
+	idnya integer,
+	acc_numb varchar,
+	namey varchar,
+	creditrate smallint,
+	preferredvendorstat boolean,
+	actflag boolean,
+	web_url varchar,
+	-- 	parameter product_vendor
+	productId integer,
+	vendorId integer,
+	avglead integer,
+	standardPrice numeric,
+	lastreceipt_cost numeric,
+	lastreceipt_date timestamp,
+	min_order integer,
+	max_order integer,
+	on_order integer,
+	unitmeasure char(3)
+)
+language plpgsql
+as
+$$
+begin
+	insert into purchasing.productvendor 
+		(productid,
+		 businessentityid,
+		 averageleadtime,
+		 standardprice,
+		 lastreceiptcost,
+		 lastreceiptdate,
+		 minorderqty,
+		 maxorderqty,
+		 onorderqty,
+		 unitmeasurecode) 
+	 values
+		(productId,
+		 vendorId,
+		 avglead,
+		 standardPrice,
+		 lastreceipt_cost,
+		 lastreceipt_date,
+		 min_order,
+		 max_order,
+		 on_order,
+		 unitmeasure);
+		 
+	insert into purchasing.vendor 
+		(businessentityid,
+		 accountnumber,
+		 name,
+		 creditrating,
+		 preferredvendorstatus,
+		 activeflag,
+		 purchasingwebserviceurl)
+	values 
+		(idnya,
+		 acc_numb,
+		 namey,
+		 creditrate,
+		 preferredvendorstat,
+		 actflag,
+		 web_url);
+	
+	commit;
+end;
+$$;
+select * from purchasing.vendor;
+select * from purchasing.productvendor;
+drop procedure if exists gabunga
+
+--salah call
+call gabung_tabel1
+(
+ 	 521::int,
+ 	 'kaofa'::varchar(15),
+ 	 'juxxx'::varchar(50),
+ 	 1::smallInt,
+ 	 true::boolean,
+ 	 true::boolean,
+ 	 'akjsdasd'::varchar(1024),
+	--  product_vendor
+	 3::integer,
+	 123::integer,
+	 17::integer,
+	 11.33::numeric,
+	 12.10::numeric,
+	 current_timestamp::timestamp,
+	 1::int,
+	 5::int,
+	 3::int,
+	 'CTN'::char(3)
+)

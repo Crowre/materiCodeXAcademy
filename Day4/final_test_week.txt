@@ -1,0 +1,24 @@
+create table vendor(
+	account_number serial primary key,
+	vendor_name varchar(40),
+	purchasing_website_url varchar(128),
+	prefered_vendor_status boolean not null default 'false',
+	set_active_vendor boolean not null default 'false'
+);
+
+create table product(
+	ProductId serial primary key,
+	Name varchar(128),
+	ProductNumber varchar(20),
+	SafetyStockLevel int
+);
+
+create table vendor_product(
+	ProductId serial primary key references product(ProductId),
+	Name varchar(60) references product(Name) not null,
+	ProductNumber int references product(ProductNumber) not null,
+	StandardPrice numeric(4,2) not null,
+	MinOrderQty int not null,
+	MaxOrderQty int not null,
+	OnOrderQty int not null						
+);

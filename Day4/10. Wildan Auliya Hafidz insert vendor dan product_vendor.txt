@@ -1,0 +1,112 @@
+-- satu
+create or replace procedure insert_vendor2(
+	idnya integer,
+	acc_numb varchar,
+	namey varchar,
+	creditrate smallint,
+	preferredvendorstat boolean,
+	actflag boolean,
+	web_url varchar
+)
+language plpgsql
+as
+$$
+begin
+	insert into purchasing.vendor (businessentityid,accountnumber,name,creditrating,preferredvendorstatus,activeflag,purchasingwebserviceurl)
+	values (idnya,acc_numb,namey,creditrate,preferredvendorstat,actflag,web_url);
+	
+	commit;
+end;
+$$;
+
+select * from purchasing.vendor
+
+CALL insert_vendor2(99,'asdasd7'::varchar(15),'nameeee'::varchar(50),1::smallInt,true::boolean,true::boolean,'akjsdasd'::varchar(1024))
+
+-- dua
+create or replace procedure insert_product_vendor(
+	productId integer,
+	vendorId integer,
+	avglead integer,
+	standardPrice numeric,
+	lastreceipt_cost numeric,
+	lastreceipt_date timestamp,
+	min_order integer,
+	max_order integer,
+	on_order integer,
+	unitmeasure char
+)
+language plpgsql
+as
+$$
+begin
+	insert into purchasing.productvendor 
+		(productid,
+		 businessentityid,
+		 averageleadtime,
+		 standardprice,
+		 lastreceiptcost,
+		 lastreceiptdate,
+		 minorderqty,
+		 maxorderqty,
+		 onorderqty,
+		 unitmeasurecode) 
+	 values
+		(productId,
+		 vendorId,
+		 avglead,
+		 standardPrice,
+		 lastreceipt_cost,
+		 lastreceipt_date,
+		 min_order,
+		 max_order,
+		 on_order,
+		 unitmeasure);
+		
+	commit;
+end;
+$$;
+
+select * from purchasing.productvendor
+select * from production.product
+call insert_product_vendor
+	(1::integer,
+	 1492::integer,
+	 17::integer,
+	 11.33::numeric,
+	 12.10::numeric,
+	 current_timestamp::timestamp,
+	 1::int,
+	 5::int,
+	 3::int,
+	 'CTN'::char(3))
+	 
+	select * from purchasing.purchaseorderdetail
+create or replace procedure addtocart(
+	purchase_order_id int,
+	purchase_order_detail_id int,
+	due_date timestamp,
+	order_qty smallInt,
+	product_id integer,
+	unit_price numeric,
+	received_qty numeric(8,2),
+	rejected_qty numeric(8,2),
+	modified_date timestamp
+)
+language plpgsql
+as
+$$
+begin
+	insert into purchasing.purchaseorderdetail values
+	(purchase_order_id,purchase_order_detail_id,due_date,order_qty,product_id,unit_price,received_qty,rejected_qty,modified_date);
+commit;
+end;
+$$;
+select * from purchasing.purchaseorderdetail
+select * from purchasing.vendor
+call addtocart()
+
+insert into purchasing.purchaseorderheader values
+(1,5,1,1,1492,1,current_timestamp,current_timestamp,20.22,38.33,22.22,current_timestamp),
+(2,2,2,2,1494,2,current_timestamp,current_timestamp,11.11,22.33,99.22,current_timestamp),
+(3,6,3,3,1496,3,current_timestamp,current_timestamp,50.22,18.33,62.22,current_timestamp)

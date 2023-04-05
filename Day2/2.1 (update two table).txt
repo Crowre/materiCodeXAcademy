@@ -1,0 +1,6 @@
+
+-- update product 
+-- set net_price = price * discount
+-- from product_segment 
+-- where product_id = product_id
+

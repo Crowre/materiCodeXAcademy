@@ -1,0 +1,57 @@
+select * from customer;
+select * from sales_order;
+select * from sales_person;
+select * from product;
+select * from item;
+select * from sales_item;
+
+create or replace function purchase_order()
+returns table(
+	purchase_order_number bigint,
+	company varchar,
+	quantity int,
+	supplier varchar,
+	name varchar,
+	price numeric,
+	total numeric,
+	salesperson text
+)
+language plpgsql
+as
+$$
+declare var_names record;
+begin
+for var_names in(
+	select sales_order.purchase_order_number,
+customer.company,
+sales_item.quantity,
+product.supplier,
+product.name,
+item.price,
+(sales_item.quantity*item.price) as total,
+concat(sales_person.first_name,' ',sales_person.last_name) as salesperson
+from sales_order
+join sales_item on sales_item.sales_order_id = sales_order.id
+join item on item.id = sales_item.item_id
+join customer on sales_order.cust_id = customer.id
+join product on product.id = item.product_id
+join sales_person on sales_person.id = sales_order.sales_person_id
+order by purchase_order_number
+)loop
+	name := upper(var_name.name);
+		purchase_order_number := var_name.purchase_order_number;
+		company := var_name.company;
+		quantity := var_name.quantity;
+		supplier := var_name.supplier;
+		price := var_name.price;
+		total := var_name.total;
+		salesperson := var_name.salesperson;
+		return next;
+end loop;
+end;
+$$;
+
+
+
+
+

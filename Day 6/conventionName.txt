@@ -1,0 +1,9 @@
+penamaan variable javascript adalah case-sensitive
+rekomendasi camel-case,snake case dan pascal case
+penamaan variable menggambarkan isinya (informatif)
+penamaan nama fungsi sama dengan aturan penamaan variable
+
+rekomendasi penamaan varbale type constant upper sneak case yang artinya nilai tidak bisa diubah
+penamaan class menggunakan pascal case
+penamaan method = penamaan fungsi
+untuk case-sensitve menggunakan pascal\

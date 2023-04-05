@@ -1,0 +1,80 @@
+create table customer(
+	first_name varchar(30) not null,
+	last_name varchar(30) not null,
+	email varchar(60) not null,
+	company varchar(60),
+	street varchar(50) not null,
+	city varchar(40),
+	state char(2) not null default 'PA',
+	zip smallint not null,
+	phone varchar(20) not null,
+	birth_date date,
+	sex char(1) not null,
+	date_entered timestamp not null,
+	id serial primary key
+);
+
+alter table customer
+alter column sex type sex_type using sex::sex_type;
+
+create table sales_person(
+	first_name varchar(30) not null,
+	last_name varchar(30) not null,
+	email varchar(60) not null,
+	street varchar(50) not null,
+	city varchar(40) not null,
+	state char(2) not null default 'PA',
+	zip smallint not null,
+	phone varchar(20) not null,
+	birth_date date,
+	sex sex_type not null,
+	date_hired timestamp not null,
+	id serial primary key
+);
+
+create table product_type(
+	name varchar(30) not null,
+	id serial primary key
+);
+
+create table product(
+	type_id integer references product_type(id),
+	name varchar(30) not null,
+	supplier varchar(30) not null,
+	description text not null,
+	id serial primary key
+);
+
+create table item(
+	product_id integer references product(id),
+	size integer not null,
+	color varchar(30) not null,
+	picture varchar(256) not null,
+	price numeric(6,2) not null,
+	id serial primary key
+);
+
+create table sales_order(
+cust_id integer references customer (id),
+sales_person_id integer references sales_person(id),
+time_order_taken timestamp not null,
+purchase_order_number integer not null,
+credit_card_number varchar(16) not null,
+credit_card_exper_month smallint not null,
+credit_card_exper_day smallint not null,
+credit_card_secret_code smallint not null,
+name_on_card varchar(100) not null,
+id serial primary key
+);
+create type sex_type as enum
+('M','F');
+
+create table sales_item(
+item_id integer references item(id),
+sales_order_id integer references sales_order(id),
+quantity integer not null,
+discount numeric(3,2) null default 0,
+taxable boolean not null default false,
+sales_tax_rate numeric(5,2) not null default 0,
+id serial primary key
+);

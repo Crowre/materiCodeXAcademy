@@ -1,0 +1,102 @@
+create table vendor(
+	id serial primary key,
+	account_number int not null,
+	vendor_name varchar(40) not null,
+	purchasing_website_url varchar(128) not null,
+	prefered_vendor_status boolean not null default 'false',
+	set_active_vendor boolean not null default 'false'
+);
+
+create table product(
+	id serial primary key,
+	ProductId int not null,
+	Name varchar(128) not null,
+	ProductNumber varchar(20) not null unique,
+	SafetyStockLevel int not null
+);
+
+select * from vendor;
+drop table vendor cascade;
+drop table product cascade;
+drop table vendor_product;
+select * from product;
+select * from vendor_product;
+
+create table vendor_product(
+	id serial primary key,
+	product_id int references product(id),
+	vendor_id int references vendor(id),
+	StandardPrice numeric(4,2) not null,
+	MinOrderQty int not null,
+	MaxOrderQty int not null,
+	OnOrderQty int not null						
+);
+--isi data vendor
+insert into vendor(account_number,vendor_name,
+purchasing_website_url,prefered_vendor_status,set_active_vendor)
+values
+(10012345,'wildan','www.insert1.com','true','true'),
+(10045671,'auliya','www.insert2.com','true','true'),
+(10153171,'hafidz','www.insert1.com','true','true'),
+(11243543,'taufik','www.insert2.com','true','true'),
+(12046635,'faldi','www.insert2.com','true','true');
+
+--isi data product
+insert into product(ProductId,Name,ProductNumber,SafetyStockLevel)
+values
+(1234,'Soda','M-1',300),
+(4522,'Teh','MT-2',100),
+(6865,'Kue','MR-1',90),
+(7564,'Kerupuk','KK-1',20),
+(8933,'Susu','MS-1',30);
+
+--isi data vendor_product
+insert into vendor_product(product_id,vendor_id,StandardPrice,MinOrderQty,MaxOrderQty,OnOrderQty)
+values
+(6,2,20.00,1,300,100),
+(3,3,30.30,30,400,10),
+(4,1,46.55,60,220,90),
+(5,4,11.00,35,200,50),
+(2,5,23.10,70,260,);
+
+--create store prosedur vendor
+create or replace procedure insert_vendor(
+	namey vendor.vendor_name%type,
+	acc_number vendor.account_number%type,
+	web_url vendor.purchasing_website_url%type
+)
+language plpgsql
+as
+$$
+begin
+insert into vendor (name,account_number,purchasing_website_url)
+values (namey,acc_number,web_url);
+commit;
+end;
+$$;
+
+call insert_vendor('123','jaja');
+--op procedure if exists insert_vendor;
+--create store prosedur product vendor
+create or replace procedure procedure_vendor_product(
+	--mengambil data dari tiap-tiap kolom pada table vendor_product
+	productId vendor_product.product_id%type,
+	vendorId vendor_product.vendor_id%type,
+	standardPrice vendor_product.StandardPrice%type,
+	min_order vendor_product.MinOrderQty%type,
+	max_order vendor_product.MaxOrderQty%type,
+	on_order vendor_product.OnOrderQty%type
+)
+language plpgsql
+as
+$$
+begin
+insert into
+--memasukkan data dari call ke table vendor_product
+vendor_product(product_id,vendor_id,StandardPrice,MinOrderQty,MaxOrderQty,OnOrderQty)
+values
+--input dari call prosedur yang akan dimasukkan ke table vendor_product
+(productId,vendorId,standardPrice,min_order,max_order,on_order);
+commit;
+end;
+$$;

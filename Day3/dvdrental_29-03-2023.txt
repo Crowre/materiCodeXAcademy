@@ -1,0 +1,75 @@
+create or replace function get_film_count(len_from int and len_to int)
+return int
+language plpqsql
+as
+$$
+declare
+	total_film integer
+begin
+	 select count(*) into total_film
+	 from film;
+	 where length between len_form and lent_to;
+	 
+	 return total_film
+end
+$$
+
+create or replace function get_film_title_byId(filmIid int)
+return film.title%type
+language plpqsql
+as
+$$
+declare
+	film_title film.title%type;
+begin
+	 select title into film_title
+	 from film;
+	 where id=filmId;
+	 
+	 if not found then
+	 	raise 'film with id % not found',filmId
+	 end if;
+	 
+	 return film_title;
+end
+$$
+
+create or replace function get_film_title_byId(filmId int)
+return film
+language plpqsql
+as
+$$
+declare
+	film_data film;
+begin
+	 select * into film_data
+	 from film
+	 where film_id=filmId;
+	 
+	 if not found then
+	 	raise 'tidak ditemukan id % yang dicari',filmId
+	 end if;
+	 
+	 return film_data;
+end
+$$
+
+select * from get_film_title(7000)
+
+--function tanpa return
+create or replace function get_film_byId_param
+(in filmId int,out filmtitle varchar)
+language plpgsql
+as
+$$
+begin
+	select title into filmcount
+	from film;
+	if not found then
+		raise 'Id % tidak ditemukan',filmId;
+	endif;
+end;
+$$;
+
+select * from customers;
+

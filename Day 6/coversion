@@ -1,0 +1,3 @@
+mengubah type data menjadi tipe data lainnya
+secara implisit = otomatis setelah eksekusi kode (coersion)
+dan eksplisit = dilakukan oleh developer (type casting)

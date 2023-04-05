@@ -1,0 +1,15 @@
+buat table vendor
+account number PK,
+vendor name,
+purchasing webservice url varchar
+prefered vendor status boolean
+set active vendor boolean
+
+buat table vendor product
+product_id pk,
+nama,
+product number varchar,
+safetystocklevel int,
+standardPrice numeric(4,2),
+MinOrderQty,MaxOrderQty,OnOrderQty,UnitMeasure int
+

@@ -1,0 +1,33 @@
+
+
+
+create or replace function get_film_byId_param
+(in filmId int,out filmtitle varchar)
+language plpgsql
+as
+$$
+begin
+	select title into filmtitle
+	from film;
+	if not found then
+		raise 'Id % tidak ditemukan',filmId;
+	end if;
+end;
+$$;
+select get_film_byId_param (20);
+drop function get_film_byId_param;
+create or replace function get_film_byId_param
+(in filmId int,out filmData film)
+language plpgsql
+as
+$$
+begin
+	select * into filmData
+	from film
+	where film_id=p_filmId;
+	if not found then
+		raise 'Id % tidak ditemukan',filmId;
+	end if;
+end;
+$$;
+

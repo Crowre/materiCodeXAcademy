@@ -1,0 +1,283 @@
+select * from sales_order;
+select * from customer;
+select * from item;
+select * from product;
+select * from sales_item;
+select * from sales_person;
+
+create view item_discount as
+select item.id,price,discount
+from item
+join sales_item on item.id = sales_item.item_id
+order by item.id;
+
+--drop view item_discount;
+select * from item_discount;
+
+select sales_item.id,
+concat(sales_person.first_name,' ',sales_person.last_name),
+product.name,item.price,
+sales_item.discount 
+from sales_item
+join sales_order on sales_order.id = sales_item.sales_order_id
+join sales_person on sales_person.id = sales_order.sales_person_id
+join item on item.id = sales_item.item_id
+join product on product.id = item.product_id
+order by product.name asc
+
+create view purchase_date as
+select sales_order.purchase_order_number,
+customer.company,
+sales_item.quantity,
+product.supplier,product.name,item.price,
+sum(item.price * sales_item.quantity) as total,
+concat(sales_person.first_name,' ',sales_person.last_name ) as full_name 
+from sales_order
+join sales_item on sales_item.sales_order_id = sales_order.id 
+join item on item.id = sales_order.id
+join customer on customer.id = sales_order.cust_id 
+join product on product.id = item.product_id
+join sales_person on sales_person.id = sales_order.sales_person_id
+--group by purchase_order_number
+order by customer.company asc;
+
+create function get_product_name_byId ()
+return product
+language plpgsql
+as
+$$
+declare
+	product_data product
+begin
+	 select * into product_data
+	 from product
+	 where product.id = productId;
+	 
+	 if not found then
+	 	raise 'tidak ditemukan id % yang dicari',productId;
+		end if
+		return product data
+end
+$$
+
+select * from get_product_name_byId()
+
+select sales_order.purchase_order_number,customer,company,sales_item.quantity,
+sales_item.quantity,product.supplier,product.name,item.price,
+(sales_item.quantity * item.price) AS total,
+CONCAT(sales_person.first_name,' ',sales_person.last_name)AS sales_person
+from sales_order 
+JOIN sales_item on sales_item.id = sales_order.id
+JOIN item ON item.id = sales_item.item_id
+JOIN customer on sales_order.cust_id = customer.id
+JOIN product on  product.id = item.product_id
+JOIN sales_person on sales_person.id = sales_order.sales_person_id
+order by purchase_order_number;
+
+
+
+create or replace function get_customer_lowercase()
+returns table (
+	first_name varchar,
+	last_name varchar
+)
+language plpgsql
+as
+$$
+declare
+	var_r record;
+begin 
+	for var_r in(
+		select first_name,last_name
+		from customer
+	) loop
+	customer_first_name :=lower(var_r.first_name);
+	customer_last_name :=lower(var_r.last_name)
+	return next
+	end loop;
+end;
+$$
+
+--dari fendy
+create or replace function purchase_order_overview()
+returns table (
+		purchase_order_number bigint,
+		company varchar,
+		quantitity int,
+		supplier varchar,
+		name varchar,
+		price numeric,
+		total numeric,
+		salesperson text
+	)
+	language plpgsql
+as
+$$
+declare
+	var_name record;
+begin
+	for var_name in(
+select sales_order.purchase_order_number,
+customer.company,
+sales_item.quantity,
+product.supplier,
+product.name,
+item.price,
+(sales_item.quantity * item.price) as total,
+concat(sales_person.first_name, ' ', sales_person.last_name) as salesperson
+from sales_order 
+join sales_item on sales_item.sales_order_id = sales_order.id
+join item on item.id = sales_item.item_id
+join customer on sales_order.cust_id = customer.id
+join product on product.id = item.product_id
+join sales_person on sales_person.id = sales_order.sales_person_id
+order by purchase_order_number
+		) loop
+		name := upper(var_name.name);
+		purchase_order_number := var_name.purchase_order_number;
+		company := var_name.company;
+		quantitity := var_name.quantity;
+		supplier := var_name.supplier;
+		price := var_name.price;
+		total := var_name.total;
+		salesperson := var_name.salesperson;
+		return next;
+		end loop;
+end;
+$$;
+
+--function tanpa deklarasi returns
+select * from purchase_order_overview();
+
+create or replace function get_price(
+	out min_price int,
+	out max_price int,
+	out avg_price numeric
+)
+language plpgsql
+as
+$$
+begin
+	select min(price),
+	max(price),
+	avg(price)::numeric(5,1)
+	into min_price,max_price,avg_price
+	from item;
+	
+end;
+$$;
+select * from get_price();
+drop function get_price();
+
+
+
+create or replace function find_price(
+	in p_product_id int,
+	out p_product_description varchar
+)
+language plpgsql
+as
+$$
+begin
+select description
+into p_product_description
+from product
+where product.id=p_product_id;
+end;
+$$;
+
+select * from find_price(2);
+
+create or replace function cursor_product()
+return setof product
+language plpgsql
+as
+$$
+declare
+	product_cursor cursor for
+					select * from product order by product.id
+					offset 10;
+begin
+	open product_cursor;
+	return query
+		fetch 10 from product_cursor;
+	close product_cursor;
+$$;
+end;
+
+create or replace function get_full_name_and_year(p_year integer)
+returns text
+language plpgsql
+as
+$$
+declare
+	year text default '';
+	rec_customer record;
+	rec_year cursor(p_year integer)
+		for select concat(first_name,' ',last_name) as full_name,
+		extract(year from date_entered) as month
+		from customer
+		where extract(year from date_entered) = p_year;
+begin
+open rec_customer(p_year)
+loop
+fetch rec_year into rec_customer;
+exit when not found;
+if rec_customer.full_name like '%ful%' then
+ full_name := full_name || ',' || rec_customer.full_name || ',' || re_customer.month
+end if;
+end loop;
+close rec_customer;
+return titles;
+$$;
+
+select * from customer;
+
+create or replace function get_total_people_in_state(	)
+returns text
+language plpgsql
+as
+$$
+declare
+states text default '';
+rec_state record;
+cur_states cursor (p_state varchar)
+	for select count(state), state
+	from customer
+	where state = p_state
+	group by state;
+begin
+open cur_states(p_state);
+loop
+	fetch cur_states into rec_state;
+	exit when not found;
+end loop;
+close cur_states;
+return states;
+end;
+$$;
+
+drop function get_total_people_in_state;
+select * from get_total_people_in_state();
+
+create or replace function get_people()
+returning table(count_state int,state varchar)
+language plpgsql
+as
+$$
+begin
+	select count(state),
+	state,
+	into count_state
+	from customer
+	group by state;
+	
+end;
+$$;
+select * from get_people();
+drop function get_price();
+
+select count(state), state
+	from customer
+	where state ='GA'
+	group by state;

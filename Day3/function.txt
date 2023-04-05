@@ -1,0 +1,88 @@
+terdiri dari bagian header dan bagian body
+
+header berisi keyword create function diikuti nama fungsi, parameter(optional),type output dan language
+
+create [or replace] function function function_name (param_list)
+    return return_type
+    language plpgql
+    as
+
+body berisi block yang terdiri dari deklarasi variable dan logic.
+body biasanya diawali dengan $$ dan diakhiri dengan $$
+
+$$
+declare
+--variable declaration
+begin
+--logic
+end;
+$$
+
+contoh
+create or replace function get_film_count (len_from int,len_to int)
+returns int
+language plpgsql
+as
+$$
+declare
+    film_count integer;
+begin
+    select count(*)
+    into film_count
+    from film
+    where length between len_from and len_to;
+
+    return film_count;
+end;
+$$;
+
+select get_film_count(40,90);
+
+contoh di pg admin
+
+create or replace function get_film_count(len_from int and len_to int)
+return int
+language plpqsql
+as
+$$
+declare
+	total_film integer
+begin
+	 select count(*) into total_film
+	 from film;
+	 where length between len_form and lent_to;
+	 return total_film
+end
+$$
+
+function tanpa deklarasi
+
+create or replace function find_film_by_id_param(in p_film_id int
+out film_title varchar)
+language plpgsql
+as$$
+begin
+
+end;
+
+--function tanpa deklarasi returns
+select * from purchase_order_overview();
+
+create or replace function get_price(
+	out min_len int,
+	out max_len int,
+	out avg_len numeric
+)
+language plpgsql
+as
+$$
+begin
+	select min(price),
+	max(price),
+	avg(price)::numeric(5,1)
+	into min_len,max_len,avg_len
+	from film;
+	
+end;
+$$;
+    

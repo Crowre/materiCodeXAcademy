@@ -1,0 +1,75 @@
+-- nomor 1
+select distinct(discount) from sales_item
+where discount > 0.15
+order by discount desc
+
+-- nomor 2
+select * from sales_order
+where time_order_taken > '2018-12-01'
+and time_order_taken < '2018-12-31'
+
+-- nomor 3
+select * from sales_order
+where time_order_taken > '2018-12-01'
+and time_order_taken < '2018-12-31'
+
+-- nomor 4
+select concat(first_name,' ',last_name)full_name from customer
+where state = 'TX'
+
+-- nomor 5
+select product_id,sum(price) from item
+group by product_id
+order by product_id
+
+-- nomor 6
+select sum(price) from item
+group by product_id
+having sum(price) > '500'
+
+-- nomor 7 
+select product_id,round(avg(price),2)rata_rata from item
+group by product_id
+order by product_id asc
+
+-- nomor 8
+select first_name,state from customer
+
+-- nomor 2.1
+select count(distinct state) from customer
+
+-- nomor 2.2
+select distinct(state) from customer
+where state != 'CA'
+
+-- nomor 2.3
+select * from customer
+where state = 'CA' 
+OR state = 'NJ'
+
+-- nomor 2.4 
+select min(discount),max(discount) from sales_item
+
+-- nomor 2.5
+select product_id,count(id) from item
+group by product_id
+
+-- nomor 2.6
+select first_name,extract(month from birth_date) from sales_person
+where extract(month from birth_date) = 12
+
+-- nomor 2.7
+select price from item
+where price is not null
+
+-- nomor 2.8
+SELECT SUM(subquery.customer_count) as total_count
+FROM (
+  SELECT COUNT(id) AS customer_count
+  FROM customer
+  GROUP BY EXTRACT(month FROM birth_date)
+  HAVING EXTRACT(month FROM birth_date) < 5
+) as subquery;
+
+
+-- nomor 2.8.1

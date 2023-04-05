@@ -1,0 +1,80 @@
+create table product (
+	id serial primary key,
+	name varchar(50) not null,
+	product_number varchar(50) not null,
+	safety_stock_level integer not null,
+	created_at timestamp default current_timestamp,
+	updated_at timestamp default current_timestamp
+);
+
+create table vendor(
+	id serial primary key,
+	account_number varchar(100) not null,
+	purchasing_web_service_url varchar(200) not null,
+	is_preferred_vendor_status boolean not null default 'false',
+	is_active_vendor boolean not null default 'false'
+);
+
+create table product_vendor(
+	id serial primary key,
+	product_id integer references product(id),
+	vendor_id integer references vendor(id),
+	standard_price numeric(4,2) not null,
+	min_order_qty integer not null,
+	max_order_qty integer not null,
+	on_order_qty integer not null
+);
+
+
+insert into product (name,product_number,safety_stock_level) values
+('gas elpiji','87187321763',38),
+('beras','44379811763',20),
+('minyak','9384187321763',44);
+	
+insert into vendor (account_number,purchasing_web_service_url) values
+('102988324','http://anjay.com'),
+('928312938','http://kamu.com'),
+('348502448','http://jelek.com');
+
+insert into product_vendor (product_id,vendor_id,standard_price,min_order_qty,max_order_qty,on_order_qty) values
+(2,2,40.23,2,10,3),
+(3,3,59.23,1,20,4)
+
+-- create store procedure vendor
+create or replace procedure insert_vendor(
+	acc_numb vendor.account_number%type,
+	web_url vendor.purchasing_web_service_url%type
+)
+language plpgsql
+as
+$$
+begin
+	insert into vendor (account_number,purchasing_web_service_url) values (acc_numb,web_url);
+	
+	commit;
+end;
+$$;
+
+call insert_vendor('999','nganu')
+
+-- create store procedure product vendor
+create or replace procedure insert_product_vendor(
+	productId product_vendor.product_id%type,
+	vendorId product_vendor.product_id%type ,
+	standardPrice product_vendor.standard_price%type,
+	min_order product_vendor.min_order_qty%type,
+	max_order product_vendor.max_order_qty%type,
+	on_order product_vendor.on_order_qty%type
+)
+language plpgsql
+as
+$$
+begin
+	insert into product_vendor (product_id,vendor_id,standard_price,min_order_qty,max_order_qty,on_order_qty) values
+	(productId,vendorId,standardPrice,min_order,max_order,on_order);
+	
+	commit;
+end;
+$$;
+
+call insert_product_vendor(3,3,99.99,1,20,4)

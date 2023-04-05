@@ -1,0 +1,16 @@
+union digunakan untuk menggabungkan data dari dua atau lebih statement select
+union menggabungkan data namun mengabaikan data yang duplikat
+union all memasukkan semua data termasuk data yang sama
+
+syaratm menggunakan union yaitu kolom yang ditampilkan harus sama
+
+contoh UNION
+select * from top_rated_films
+union
+select * from most_popular_films;
+
+contoh UNION ALL
+select * from top_rated_films
+union all
+select * from most_popular_films;
+
